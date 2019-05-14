@@ -1,0 +1,17 @@
+{
+  "name": "jsamo",
+  "version": "1.0.0",
+  "description": "node tools for addons.mozilla.org",
+  "author": "Philipp Kewisch <mozilla@kewis.ch>",
+  "repository": "kewisch/jsamo",
+  "main": "src/loader.js",
+  "bin": {
+    "amo": "src/loader.js"
+  },
+  "dependencies": {
+    "amolib": "kewisch/amolib",
+    "esm": "^3.2.22",
+    "yargs": "^13.2.2"
+  },
+  "license": "MPL-2.0"
+}
