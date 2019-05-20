@@ -49,7 +49,7 @@ import * as commands from "./commands";
       subyargs.option("c", {
         "alias": "chunk",
         "type": "number",
-        "default": 50,
+        "default": 1,
         "nargs": 1,
         "describe": "The number of requests to fire at a time"
       });

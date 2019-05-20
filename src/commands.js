@@ -7,10 +7,8 @@ import { spawnSync } from "child_process";
 
 import {
   ADDON_STATUS, ADDON_STATUS_STRINGS,
-  UserAdminPage, AddonAdminPage
+  AddonAdminPage, DjangoUserModels
 } from "amolib";
-
-import { chunk } from "./utils";
 
 export async function adminchange(session, ids=[], args={}) {
   let failed = [];
@@ -54,36 +52,11 @@ export async function adminchange(session, ids=[], args={}) {
 }
 
 export async function ban(session, ids, argv) {
-  let failed = [];
-  let commandStart = new Date();
+  let start = new Date();
+  let userModels = new DjangoUserModels(session);
 
-  async function banUser(id) {
-    let start = new Date();
-    let user = new UserAdminPage(session, id);
-    return user.ban().then(() => {
-      console.log(`Banned ${id} in ${((new Date()) - start) / 1000} seconds`);
-    }, (e) => {
-      console.error(e);
-      failed.push(id);
-    });
-  }
-
-  let chunks = argv.chunk == 0 ? [ids] : chunk(ids, argv.chunk);
-
-  await chunks.reduce((previous, chunkids, idx) => {
-    return previous.then(() => {
-      console.log(`Starting chunk ${idx + 1} of ${chunks.length}`);
-      return Promise.all(chunkids.map(id => banUser(id)));
-    });
-  }, Promise.resolve());
-
-
-  if (failed.length) {
-    console.error("Failed to ban the following users:\n");
-    console.error(failed.join("\n"));
-  } else {
-    console.log(`Banned ${ids.length} users in ${(new Date() - commandStart) / 1000} seconds`);
-  }
+  await userModels.ban(ids);
+  console.log(`Banned ${ids.length} users in ${(new Date() - start) / 1000} seconds`);
 }
 
 export async function pyamo(argv) {
