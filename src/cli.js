@@ -7,10 +7,12 @@ import os from "os";
 import path from "path";
 import yargs from "yargs";
 
-import { ADDON_STATUS_STRINGS, AMOSession } from "amolib";
-import * as commands from "./commands";
+import { ADDON_STATUS_STRINGS, AMOSession, AMORedashClient, getConfig } from "amolib";
+import JSAmo from "./jsamo";
 
 (async function() {
+  let config = getConfig();
+
   let argv = yargs
     .option("debug", {
       "boolean": true,
@@ -66,15 +68,22 @@ import * as commands from "./commands";
     .wrap(120)
     .argv;
 
-  let session = new AMOSession({ debug: argv.debug });
-  session.loadCookies(path.join(os.homedir(), ".amo_cookie"));
+  let jsamo = new JSAmo({
+    amo: new AMOSession({ debug: argv.debug }),
+    redash: new AMORedashClient({
+      apiToken: config.auth && config.auth.redash_key,
+      debug: argv.debug
+    })
+  });
+
+  jsamo.amo.loadCookies(path.join(os.homedir(), ".amo_cookie"));
 
   switch (argv._[0]) {
     case "adminchange":
-      await commands.adminchange(session, argv.ids, argv);
+      await jsamo.adminchange(argv.ids, argv);
       break;
     case "adminban":
-      await commands.ban(session, argv.ids, argv);
+      await jsamo.ban(argv.ids, argv);
       break;
 
     case "info":
@@ -85,7 +94,7 @@ import * as commands from "./commands";
     case "upload":
     case "adminget":
     case "decide":
-      await commands.pyamo(process.argv.slice(2));
+      await jsamo.pyamo(process.argv.slice(2));
       break;
   }
 })().catch((err) => {
