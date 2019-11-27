@@ -59,13 +59,13 @@ export default class JSAmo {
           }
         } else if (args.enable) {
           addon.status = hasStatus ? status : ADDON_STATUS.APPROVED;
-          await addon.enableFiles();
+          await addon.enableAllFiles();
         } else if (args.disable) {
           addon.status = hasStatus ? status : ADDON_STATUS.DISABLED;
-          await addon.disableFiles();
+          await addon.disableAllFiles();
         } else if (hasStatus) {
           addon.status = status;
-          await addon.update([]);
+          await addon.update();
         }
       } catch (e) {
         console.error(e);
