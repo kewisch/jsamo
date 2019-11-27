@@ -4,6 +4,7 @@
  * Portions Copyright (C) Philipp Kewisch, 2019 */
 
 import { spawnSync } from "child_process";
+import { SingleBar, Presets } from "cli-progress";
 
 import {
   ADDON_STATUS, ADDON_STATUS_STRINGS, ADDON_STATUS_VALUES,
@@ -17,18 +18,27 @@ export default class JSAmo {
   }
 
   async adminstatus(ids=[]) {
+    let format = "Getting status [{bar}] {percentage}% | ETA: {eta_formatted} | {value}/{total}";
+    let bar = new SingleBar({ format }, Presets.legacy);
+    bar.start(ids.length, 0);
+
     let status = await Promise.all(ids.map(async (id) => {
       let addon = new AddonAdminPage(this.amo, id);
       await addon.loadPage();
+      bar.increment();
 
       return `${id}: ${ADDON_STATUS_VALUES[parseInt(addon.status, 10)]}`;
     }));
+    bar.stop();
 
     console.log(status.join("\n"));
   }
 
   async adminchange(ids=[], args={}) {
     let failed = [];
+    let format = "Changing add-ons [{bar}] {percentage}% | ETA: {eta_formatted} | {value}/{total}";
+    let bar = new SingleBar({ format }, Presets.legacy);
+    bar.start(ids.length, 0);
 
     await Promise.all(ids.map(async (id) => {
       let addon = new AddonAdminPage(this.amo, id);
@@ -61,8 +71,10 @@ export default class JSAmo {
         console.error(e);
         failed.push(id);
       }
-    }));
 
+      bar.increment();
+    }));
+    bar.stop();
 
     if (failed.length) {
       console.error("Failed to process the following ids:\n");

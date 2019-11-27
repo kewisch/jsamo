@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "amolib": "github:kewisch/amolib",
+    "cli-progress": "^3.4.0",
     "esm": "^3.2.22",
     "yargs": "^13.2.2"
   },
