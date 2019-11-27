@@ -9,7 +9,7 @@
     "amo": "src/loader.js"
   },
   "dependencies": {
-    "amolib": "kewisch/amolib",
+    "amolib": "github:kewisch/amolib",
     "esm": "^3.2.22",
     "yargs": "^13.2.2"
   },
