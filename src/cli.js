@@ -16,7 +16,13 @@ import JSAmo from "./jsamo";
   let argv = yargs
     .option("debug", {
       "boolean": true,
+      "global": true,
       "describe": "Enable debugging"
+    })
+    .option("debugSequential", {
+      "boolean": true,
+      "global": true,
+      "describe": "When logging requests, group request and response"
     })
     .command("adminstatus [ids...]", "Show status for the add-ons", (subyargs) => {
 
@@ -72,7 +78,10 @@ import JSAmo from "./jsamo";
     .argv;
 
   let jsamo = new JSAmo({
-    amo: new AMOSession({ debug: argv.debug }),
+    amo: new AMOSession({
+      debug: argv.debug,
+      sequential: argv.debugSequential
+    }),
     redash: new AMORedashClient({
       apiToken: config.auth && config.auth.redash_key,
       debug: argv.debug
