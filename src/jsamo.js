@@ -6,7 +6,7 @@
 import { spawnSync } from "child_process";
 
 import {
-  ADDON_STATUS, ADDON_STATUS_STRINGS,
+  ADDON_STATUS, ADDON_STATUS_STRINGS, ADDON_STATUS_VALUES,
   AddonAdminPage, DjangoUserModels
 } from "amolib";
 
@@ -16,11 +16,23 @@ export default class JSAmo {
     this.redash = redash;
   }
 
+  async adminstatus(ids=[]) {
+    let status = await Promise.all(ids.map(async (id) => {
+      let addon = new AddonAdminPage(this.amo, id);
+      await addon.loadPage();
+
+      return `${id}: ${ADDON_STATUS_VALUES[parseInt(addon.status, 10)]}`;
+    }));
+
+    console.log(status.join("\n"));
+  }
+
   async adminchange(ids=[], args={}) {
     let failed = [];
 
     await Promise.all(ids.map(async (id) => {
       let addon = new AddonAdminPage(this.amo, id);
+      await addon.ensureLoaded();
 
       let status = ADDON_STATUS_STRINGS[args.status];
       let hasStatus = ADDON_STATUS_STRINGS.hasOwnProperty(args.status);
@@ -36,11 +48,14 @@ export default class JSAmo {
             await addon.disableVersions(args.versions);
           }
         } else if (args.enable) {
-          addon.status = hasStatus ? ADDON_STATUS.APPROVED : status;
+          addon.status = hasStatus ? status : ADDON_STATUS.APPROVED;
           await addon.enableFiles();
         } else if (args.disable) {
-          addon.status = hasStatus ? ADDON_STATUS.DISABLED : status;
+          addon.status = hasStatus ? status : ADDON_STATUS.DISABLED;
           await addon.disableFiles();
+        } else if (hasStatus) {
+          addon.status = status;
+          await addon.update([]);
         }
       } catch (e) {
         console.error(e);

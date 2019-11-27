@@ -18,6 +18,9 @@ import JSAmo from "./jsamo";
       "boolean": true,
       "describe": "Enable debugging"
     })
+    .command("adminstatus [ids...]", "Show status for the add-ons", (subyargs) => {
+
+    })
     .command("adminchange [ids...]", "Admin-disable an add-on and all its files", (subyargs) => {
       subyargs.option("d", {
         "alias": "disable",
@@ -81,6 +84,9 @@ import JSAmo from "./jsamo";
   switch (argv._[0]) {
     case "adminchange":
       await jsamo.adminchange(argv.ids, argv);
+      break;
+    case "adminstatus":
+      await jsamo.adminstatus(argv.ids);
       break;
     case "adminban":
       await jsamo.ban(argv.ids, argv);
