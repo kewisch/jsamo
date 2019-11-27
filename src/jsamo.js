@@ -42,12 +42,12 @@ export default class JSAmo {
 
     await Promise.all(ids.map(async (id) => {
       let addon = new AddonAdminPage(this.amo, id);
-      await addon.ensureLoaded();
-
-      let status = ADDON_STATUS_STRINGS[args.status];
-      let hasStatus = ADDON_STATUS_STRINGS.hasOwnProperty(args.status);
-
       try {
+        await addon.ensureLoaded();
+
+        let status = ADDON_STATUS_STRINGS[args.status];
+        let hasStatus = ADDON_STATUS_STRINGS.hasOwnProperty(args.status);
+
         if (args.versions) {
           if (hasStatus) {
             addon.status = status;
